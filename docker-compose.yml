@@ -7,10 +7,11 @@ services:
             - "80:80"
         volumes:
             - ./hosts:/etc/nginx/conf.d
-            - ./app:/var/www/app
+            - ./www:/var/www
             - ./logs/nginx:/var/log/nginx
         depends_on:
             - php
+        restart: unless-stopped
 
     php:
         build: ./
@@ -18,7 +19,7 @@ services:
         links:
             - mysql
         volumes:
-            - ./app:/var/www/app
+            - ./www:/var/www
             - ./logs/app:/var/log
 
     mysql:
