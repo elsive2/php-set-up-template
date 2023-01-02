@@ -1,0 +1,45 @@
+version: '3'
+services:
+    nginx:
+        image: nginx:latest
+        container_name: nginx
+        ports:
+            - "80:80"
+        volumes:
+            - ./hosts:/etc/nginx/conf.d
+            - ./app:/var/www/app
+            - ./logs/nginx:/var/log/nginx
+        depends_on:
+            - php
+
+    php:
+        build: ./
+        container_name: php
+        links:
+            - mysql
+        volumes:
+            - ./app:/var/www/app
+            - ./logs/app:/var/log
+
+    mysql:
+        image: mysql:8.0.0
+        container_name: mysqlHost
+        ports:
+            - "3306:3306"
+        volumes:
+            - ./etc/mysql:/etc/mysql
+            - ./logs/mysql:/var/log/mysql
+            - ./tmp:/var/tmp
+            - ./mysql:/var/lib/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: 'password'
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin:latest
+        environment:
+            - PMA_HOST=mysqlHost
+            - PMA_USER=root
+            - PMA_PASSWORD=password
+            - PMA_ARBITRARY=1
+        ports:
+            - "8080:80"
